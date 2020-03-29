@@ -11,8 +11,8 @@ from collections import defaultdict
 import time
 
 
-# Compute the Betweenness Centrality for every vertex
-# Returns a dictionary, with node and Betweenness Centrality for each node
+# Compute the Betweenness centrality for every vertex
+# Returns a dictionary, with node and Betweenness centrality for each node
 def bc(G, normalize=True, directed_graph=True):
     vertices = list(G.nodes())
     bc_dict = {}
@@ -25,18 +25,18 @@ def bc(G, normalize=True, directed_graph=True):
             #     with all the shortest paths between 2 vertices
             # all_paths is a dict (from a vertex) of dict (to all vertices),
             # containing a list of list (shortest paths)
-            if vk != vj and has_path(G, vj, vk):
+            if vk != vj and _has_path(G, vj, vk):
                 all_paths[vj][vk] = [path for path in
                                        nx.all_shortest_paths(G, vj, vk)]
 
-    # For each vertex, compute the Betweenness Centrality
+    # For each vertex, compute the Betweenness centrality
     for vi in vertices:
-        # Betweenness Centrality of the node
+        # Betweenness centrality of the node
         bc_node = 0
         for vj in vertices:
-            if vj != vk:
+            if vj != vi:
                 for vk in vertices:
-                    if vk != vj and vk != vi and has_path(G, vj, vk):
+                    if vk != vj and vk != vi and _has_path(G, vj, vk):
                         # Count the number of shortest paths that go through vi
                         sp_through_vi = 0
                         for path in all_paths[vj][vk]:
@@ -44,7 +44,7 @@ def bc(G, normalize=True, directed_graph=True):
                                 sp_through_vi += 1
                         # Number of shortest paths
                         nb_sp = len(all_paths[vj][vk])
-                        # Betweenness Centrality of the node
+                        # Betweenness centrality of the node
                         bc_node += sp_through_vi/nb_sp
         if normalize:
             bc_dict[vi] = (bc_node * 2) / ((len(vertices) - 1)*(len(vertices) - 2))
@@ -57,7 +57,7 @@ def bc(G, normalize=True, directed_graph=True):
 
 
 # Test if there is a path from source to target
-def has_path(G, source, target):
+def _has_path(G, source, target):
     try:
         nx.shortest_path(G, source, target)
     except nx.NetworkXNoPath:
@@ -82,9 +82,9 @@ nx.draw_networkx(G_sub, with_labels=True)
 print("===")
 
 
-# My implementation of Betweenness Centrality
+# My implementation of Betweenness centrality
 start1 = time.clock()
-print("My implementation of Betweenness Centrality")
+print("My implementation of Betweenness centrality")
 print("---")
 bc_dict = bc(G_sub, normalize=True, directed_graph=True)
 for node, bc in bc_dict.items():
@@ -94,9 +94,9 @@ print("===")
 end1 = time.clock()
 
 
-# Betweenness Centrality function from networkx
+# Betweenness centrality function from networkx
 start2 = time.clock()
-print("Betweenness Centrality function from networkx")
+print("Betweenness centrality function from networkx")
 print("---")
 bc_dict = nx.betweenness_centrality(G_sub)
 for node, bc in bc_dict.items():
