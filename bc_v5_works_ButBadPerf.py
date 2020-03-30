@@ -25,7 +25,7 @@ def bc(G, normalize=True, directed_graph=True):
             #     with all the shortest paths between 2 vertices
             # all_paths is a dict (from a vertex) of dict (to all vertices),
             # containing a list of list (shortest paths)
-            if vk != vj and _has_path(G, vj, vk):
+            if vk != vj and nx.has_path(G, vj, vk):
                 all_paths[vj][vk] = [path for path in
                                        nx.all_shortest_paths(G, vj, vk)]
 
@@ -36,7 +36,7 @@ def bc(G, normalize=True, directed_graph=True):
         for vj in vertices:
             if vj != vi:
                 for vk in vertices:
-                    if vk != vj and vk != vi and _has_path(G, vj, vk):
+                    if vk != vj and vk != vi and nx.has_path(G, vj, vk):
                         # Count the number of shortest paths that go through vi
                         sp_through_vi = 0
                         for path in all_paths[vj][vk]:
@@ -57,13 +57,15 @@ def bc(G, normalize=True, directed_graph=True):
 
 
 # Test if there is a path from source to target
+# UNUSED : instead use of nx.has_path(G,source,target)
+'''
 def _has_path(G, source, target):
     try:
         nx.shortest_path(G, source, target)
     except nx.NetworkXNoPath:
         return False
     return True
-
+'''
 
 
 # TESTS
