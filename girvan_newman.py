@@ -1,11 +1,10 @@
 import itertools
 import networkx as nx
-from networkx.algorithms.community.centrality import girvan_newman as nx_girvan_newman
 from tools import Timer
 from collections import defaultdict
 
 
-def our_girvan_newman(G):
+def girvan_newman(G):
     """Girvan Newman Algorithm"""
     G = G.copy()
     # instantiate the yield conditions
@@ -86,72 +85,5 @@ def edge_betweenness(counted_paths, edge):
     return sum
 
 
-def unit_tests():
-    """Unit test main function"""
-    # todo
-    pass
-
-
-def dev():
-    """dev function, to remove when the module is
-    finished and the unit test are written"""
-    G = nx.read_edgelist('subgraph.gz')
-
-    # G = nx.grid_graph([10, 10])
-
-    # G = nx.Graph()
-    # G.add_edge(1, 2)
-    # G.add_edge(1, 3)
-    # G.add_edge(1, 4)
-    # G.add_edge(2, 3)
-    # G.add_edge(3, 4)
-    # G.add_edge(4, 5)
-    # G.add_edge(4, 6)
-    # G.add_edge(5, 6)
-    # G.add_edge(6, 7)
-    # G.add_edge(7, 8)
-    # G.add_edge(8, 5)
-    # G.add_edge(5, 7)
-    # G.add_edge(6, 8)
-    # G.add_edge(7, 9)
-
-    print(len(G.edges))
-
-    def print_infos(communities):
-        """print some information regarding tuple of communities
-        """
-        communities = list(communities)
-        communities.sort(key=lambda x: len(x))
-        print(f"Number of communities : {len(communities)}")
-        print(f"Size of the smallest of community : {len(communities[0])}")
-        print(f"Size of the biggest of community : {len(communities[-1])}")
-
-    nx_it = nx_girvan_newman(G)
-    our_it = our_girvan_newman(G)
-
-    while True:
-        try:
-            with Timer("Networkx Pass"):
-                nx_communities = next(nx_it)
-        except StopIteration:
-            break
-        print("Nx communities")
-        print_infos(nx_communities)
-
-        print("")
-
-        try:
-            with Timer("Our Pass"):
-                our_communities = next(our_it)
-        except StopIteration:
-            break
-        print("Our communities")
-        print_infos(our_communities)
-
-        print("")
-        print("")
-
-
 if __name__ == '__main__':
-    unit_tests()
-    dev()
+    print("You can import this module with : \"import girvan_newman\"")
