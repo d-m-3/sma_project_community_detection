@@ -6,6 +6,7 @@ from networkx.algorithms.community.centrality import girvan_newman as nx_girvan_
 
 def our_girvan_newman(G):
     """Girvan Newman Algorithm"""
+    G = G.copy()
     # instantiate the yield conditions
     current_number_of_communities = len(tuple(nx.connected_components(G)))
     new_number_of_communities = None
@@ -19,7 +20,6 @@ def our_girvan_newman(G):
             try:
                 paths = list(nx.all_shortest_paths(G, vi, vj))
                 all_shortest_paths[(vi, vj)] = paths
-                all_shortest_paths[(vj, vi)] = paths
             except nx.exception.NetworkXNoPath:
                 all_shortest_paths[(vi, vj)] = []
 
@@ -50,8 +50,18 @@ def our_girvan_newman(G):
 
 def edge_betweenness(all_shortest_paths, edge):
     """Calculate the edge betweeness score for a given edge"""
-    # todo
-    return random.random()
+    vi, vj = edge
+    sum = 0
+
+    for (vp, vq), paths in all_shortest_paths.items():
+        numerator = 0
+        denominator = len(paths)
+        for path in paths:
+            if any([vi, vj] == path[i:i + 2] or [vj, vi] == path[i:i + 2] for i in range(len(path))):
+                numerator += 1
+        if denominator != 0:
+            sum += numerator / denominator
+    return sum
 
 
 def unit_tests():
@@ -64,7 +74,24 @@ def dev():
     """dev function, to remove when the module is
     finished and the unit test are written"""
     # G = nx.read_edgelist('subgraph.gz')
-    G = nx.grid_graph([2, 2])
+
+    # G = nx.grid_graph([4, 4])
+
+    G = nx.Graph()
+    G.add_edge(1, 2)
+    G.add_edge(1, 3)
+    G.add_edge(1, 4)
+    G.add_edge(2, 3)
+    G.add_edge(3, 4)
+    G.add_edge(4, 5)
+    G.add_edge(4, 6)
+    G.add_edge(5, 6)
+    G.add_edge(6, 7)
+    G.add_edge(7, 8)
+    G.add_edge(8, 5)
+    G.add_edge(5, 7)
+    G.add_edge(6, 8)
+    G.add_edge(7, 9)
 
     def print_infos(communities):
         """print some information regarding tuple of communities
@@ -75,9 +102,21 @@ def dev():
         print(f"Size of the smallest of community : {len(communities[0])}")
         print(f"Size of the biggest of community : {len(communities[-1])}")
 
-    for nx_communities, our_communities in zip(nx_girvan_newman(G), our_girvan_newman(G)):
+    nx_it = nx_girvan_newman(G)
+    our_it = our_girvan_newman(G)
+
+    while True:
+        try:
+            nx_communities = next(nx_it)
+        except StopIteration:
+            break
         print("Nx communities")
         print_infos(nx_communities)
+
+        try:
+            our_communities = next(our_it)
+        except StopIteration:
+            break
         print("Our communities")
         print_infos(our_communities)
         print("")
