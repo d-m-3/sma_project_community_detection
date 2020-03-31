@@ -1,7 +1,8 @@
 import itertools
-import random
 import networkx as nx
 from networkx.algorithms.community.centrality import girvan_newman as nx_girvan_newman
+from tools import Timer
+from collections import defaultdict
 
 
 def our_girvan_newman(G):
@@ -15,6 +16,7 @@ def our_girvan_newman(G):
     while len(G.edges) > 0:
         # calculate all the shortest path for every combination of nodes
         # needed for the edge_betweeness computation
+
         all_shortest_paths = {}
         for vi, vj in itertools.combinations(G.nodes, 2):
             try:
@@ -23,10 +25,13 @@ def our_girvan_newman(G):
             except nx.exception.NetworkXNoPath:
                 all_shortest_paths[(vi, vj)] = []
 
+        # compute dictionary needed by edge betweenness
+        counted_paths = count_paths(all_shortest_paths, G.edges)
+
         # evaluate the "weekness" of the edges of the graph using
         # edge_betweeness algorithm
         edge_betweenness_dict = {edge: edge_betweenness(
-            all_shortest_paths, edge) for edge in G.edges}
+            counted_paths, edge) for edge in G.edges}
 
         # take the edge with the highest edge_betweenness score
         edge_to_remove = max(edge_betweenness_dict.keys(),
@@ -48,17 +53,34 @@ def our_girvan_newman(G):
             yield tuple(nx.connected_components(G))
 
 
-def edge_betweenness(all_shortest_paths, edge):
-    """Calculate the edge betweeness score for a given edge"""
+def count_paths(all_shortest_paths, edges):
+    """Return a dictionary containing for every shortest path for all
+    combination of endpoints:
+    - The number of paths
+    - For each edge : the number of path involved
+    """
+    count_paths = {}
+    for (start, end), paths in all_shortest_paths.items():
+        nb_paths = len(paths)
+        counted_paths = defaultdict(lambda: 0)
+        for path in paths:
+            edges_pathlr = list(zip(path[:-1], path[1:]))
+            for l, r in edges_pathlr:
+                counted_paths[(l, r)] += 1
+                counted_paths[(r, l)] += 1
+        count_paths[(start, end)] = (nb_paths, counted_paths)
+    return count_paths
+
+
+def edge_betweenness(counted_paths, edge):
+    """Calculate the edge betweeness score for a given edge
+    Need the counted_path dictionary containing the precomputed number of paths
+    """
     vi, vj = edge
     sum = 0
-
-    for (vp, vq), paths in all_shortest_paths.items():
-        numerator = 0
-        denominator = len(paths)
-        for path in paths:
-            if any([vi, vj] == path[i:i + 2] or [vj, vi] == path[i:i + 2] for i in range(len(path))):
-                numerator += 1
+    for (vp, vq), (nb_paths, counted_paths) in counted_paths.items():
+        numerator = counted_paths[edge]
+        denominator = nb_paths
         if denominator != 0:
             sum += numerator / denominator
     return sum
@@ -73,25 +95,27 @@ def unit_tests():
 def dev():
     """dev function, to remove when the module is
     finished and the unit test are written"""
-    # G = nx.read_edgelist('subgraph.gz')
+    G = nx.read_edgelist('subgraph.gz')
 
-    # G = nx.grid_graph([4, 4])
+    # G = nx.grid_graph([10, 10])
 
-    G = nx.Graph()
-    G.add_edge(1, 2)
-    G.add_edge(1, 3)
-    G.add_edge(1, 4)
-    G.add_edge(2, 3)
-    G.add_edge(3, 4)
-    G.add_edge(4, 5)
-    G.add_edge(4, 6)
-    G.add_edge(5, 6)
-    G.add_edge(6, 7)
-    G.add_edge(7, 8)
-    G.add_edge(8, 5)
-    G.add_edge(5, 7)
-    G.add_edge(6, 8)
-    G.add_edge(7, 9)
+    # G = nx.Graph()
+    # G.add_edge(1, 2)
+    # G.add_edge(1, 3)
+    # G.add_edge(1, 4)
+    # G.add_edge(2, 3)
+    # G.add_edge(3, 4)
+    # G.add_edge(4, 5)
+    # G.add_edge(4, 6)
+    # G.add_edge(5, 6)
+    # G.add_edge(6, 7)
+    # G.add_edge(7, 8)
+    # G.add_edge(8, 5)
+    # G.add_edge(5, 7)
+    # G.add_edge(6, 8)
+    # G.add_edge(7, 9)
+
+    print(len(G.edges))
 
     def print_infos(communities):
         """print some information regarding tuple of communities
@@ -107,18 +131,24 @@ def dev():
 
     while True:
         try:
-            nx_communities = next(nx_it)
+            with Timer("Networkx Pass"):
+                nx_communities = next(nx_it)
         except StopIteration:
             break
         print("Nx communities")
         print_infos(nx_communities)
 
+        print("")
+
         try:
-            our_communities = next(our_it)
+            with Timer("Our Pass"):
+                our_communities = next(our_it)
         except StopIteration:
             break
         print("Our communities")
         print_infos(our_communities)
+
+        print("")
         print("")
 
 
