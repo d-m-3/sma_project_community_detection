@@ -14,7 +14,8 @@ import time
 
 # Compute the Betweenness centrality for every vertex
 # Returns a dictionary, with node and Betweenness centrality for each node
-def betweenness_centrality(G, normalize=True, directed_graph=True, shortest_paths_time=False):
+def betweenness_centrality(G, normalize=True, directed_graph=True,
+                           shortest_paths_time=False):
     vertices = list(G.nodes())
     bc_dict = {}
     all_paths = defaultdict(dict)
@@ -35,7 +36,8 @@ def betweenness_centrality(G, normalize=True, directed_graph=True, shortest_path
 
     # Display the computation time to get all the shortest paths
     if shortest_paths_time:
-        print("Time to compute all the shortest paths :", time.clock() - start, "\n---")
+        print("Time to compute all the shortest paths :",
+              time.clock() - start, "\n---")
 
     # For each vertex, compute the Betweenness centrality
     for vi in vertices:
@@ -64,26 +66,19 @@ def betweenness_centrality(G, normalize=True, directed_graph=True, shortest_path
     return bc_dict
 
 
-# Test if there is a path from source to target
-# UNUSED : instead use of nx.has_path(G,source,target)
-'''
-def _has_path(G, source, target):
-    try:
-        nx.shortest_path(G, source, target)
-    except nx.NetworkXNoPath:
-        return False
-    return True
-'''
-
-# Function to draw the graph with k top users
+# Function to draw the graph and highlight the k top users
 def draw_graph(G, k_top_users_list):
     pos = nx.spring_layout(G)
     val_map = {}
     for top_user in k_top_users_list:
-        val_map[top_user] = 'green'
+        val_map[top_user] = 'red'
     values = [val_map.get(node, 'blue') for node in G.nodes()]
-    nx.draw(G, pos, with_labels = True, node_color = values, edge_color = 'b' ,width = 1, alpha = 0.7)
+    plt.figure(1,figsize=(12,12))
+    nx.draw(G, pos, with_labels = True, node_size = 60, font_size = 8,
+            node_color=values, edge_color = 'g', width = 1, alpha = 0.7)
     return pos
+
+
 
 # TESTS
 # =====
@@ -97,22 +92,26 @@ nx.write_edgelist(G_sub, "subgraph.gz")
 '''
 # Load only a previously created subgraph
 G_sub = nx.read_edgelist('subgraph.gz', create_using=nx.DiGraph())
-#nx.draw_networkx(G_sub, with_labels=True)
 print("===")
+
+
+# Define the number of top users (k) we are interested to show
+k = 4
 
 
 # My implementation of Betweenness centrality
 start1 = time.clock()
 print("My implementation of Betweenness centrality")
 print("---")
-bc_dict = betweenness_centrality(G_sub, normalize=True, directed_graph=True, shortest_paths_time=True)
+bc_dict = betweenness_centrality(G_sub, normalize=True, directed_graph=True,
+                                 shortest_paths_time = False)
 for node, bc in bc_dict.items():
     if bc > 0:
         print("Node", node, "| Betweenness centrality :", bc)
 end1 = time.clock()
 print("---")
-k_top_users_list = sorted(bc_dict, key=bc_dict.get, reverse=True)[:3]
-print(f"The 3 top users are : {k_top_users_list}")
+k_top_users_list = sorted(bc_dict, key=bc_dict.get, reverse=True)[:k]
+print(f"The {k} top users are : {k_top_users_list}")
 print("===")
 
 
@@ -126,7 +125,7 @@ for node, bc in bc_dict.items():
         print("Node", node, "| Betweenness centrality :", bc)
 end2 = time.clock()
 print("---")
-print(f"The 3 top users are : {sorted(bc_dict, key=bc_dict.get, reverse=True)[:3]}")
+print(f"The {k} top users are : {sorted(bc_dict, key=bc_dict.get, reverse=True)[:k]}")
 print("===")
 
 
@@ -135,7 +134,7 @@ print('My Betweenness centrality, computation time: ' + str(end1 - start1))
 print('Betweenness centrality from networkx, computation time: ' + str(end2 - start2))
 
 
-# Draw
+# Draw the graph and highlight the k top users
 pos = draw_graph(G_sub, k_top_users_list)
 plt.show()
 
