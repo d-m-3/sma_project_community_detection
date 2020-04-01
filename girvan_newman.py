@@ -13,11 +13,11 @@ def girvan_newman(G):
 
     # iterate while its still possible to remove edges
     while len(G.edges) > 0:
-        edge_betweenness_dict = get_edge_betweenness_dict(G)
+        edge_betweenness = edge_betweenness_centrality(G)
 
-        # take the edge with the highest edge_betweenness score
-        edge_to_remove = max(edge_betweenness_dict.keys(),
-                             key=edge_betweenness_dict.get)
+        # take the edge with the highest edge betweenness score
+        edge_to_remove = max(edge_betweenness.keys(),
+                             key=edge_betweenness.get)
 
         # remove this edge, unpacking because remove_edge want
         # the two endpoints of the edge
@@ -36,7 +36,7 @@ def girvan_newman(G):
             yield tuple(communities)
 
 
-def get_edge_betweenness_dict(G):
+def edge_betweenness_centrality(G):
     """Calculate the edge betweeness score for every edges of the graph
     """
     # calculate all the shortest path for every combination of nodes
@@ -64,13 +64,13 @@ def get_edge_betweenness_dict(G):
 
     # evaluate the "weekness" of the edges of the graph using
     # edge_betweeness algorithm
-    edge_betweenness_dict = {edge: edge_betweenness(
+    edge_betweenness_dict = {edge: edge_betweenness_on_edge(
         counted_paths, edge) for edge in G.edges}
 
     return edge_betweenness_dict
 
 
-def edge_betweenness(counted_paths, edge):
+def edge_betweenness_on_edge(counted_paths, edge):
     """Calculate the edge betweeness score for a given edge
     Need the counted_path dictionary containing the precomputed number of paths
     """
