@@ -4,10 +4,12 @@ Social Media Analytics – Project 6 – Community Detection in a Youtube Networ
 
 ## Girvan Newman
 
+<!-- todo -->
+
 ### Dataset
 
 ### Implementation
 
 ### Analysis
 
-### Vizualisation
+### Visualization
