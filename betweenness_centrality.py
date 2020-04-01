@@ -4,8 +4,7 @@ from collections import defaultdict
 import time
 
 
-def betweenness_centrality(G, normalize=True, directed_graph=True,
-                           shortest_paths_time=False):
+def betweenness_centrality(G, normalize=True, shortest_paths_time=False):
     """Computes the Betweenness centrality for every vertex.
     Returns a dictionary, with node and Betweenness centrality for each node.
     """
@@ -19,25 +18,21 @@ def betweenness_centrality(G, normalize=True, directed_graph=True,
     for vi in vertices:
         # Betweenness centrality of the node
         bc_node = 0
-        for vj in vertices:
-            if vj != vi:
-                for vk in vertices:
-                    if vk != vj and vk != vi and nx.has_path(G, vj, vk):
-                        # Count the number of shortest paths that go through vi
-                        sp_through_vi = 0
-                        for path in all_paths[vj][vk]:
-                            if vi in path[1:-1]: #path[1:-1], to exclude vj and vk
-                                sp_through_vi += 1
-                        # Number of shortest paths
-                        nb_sp = len(all_paths[vj][vk])
-                        # Betweenness centrality of the node
-                        bc_node += sp_through_vi/nb_sp
+        for i, vj in enumerate(vertices[:-1]): # Exclude last, because vk = vj + 1
+            for vk in vertices[i+1:]:
+                # Count the number of shortest paths that go through vi
+                sp_through_vi = 0
+                for path in all_paths[vj][vk]:
+                    if vi in path[1:-1]: #path[1:-1], to exclude vj and vk
+                        sp_through_vi += 1
+                # Number of shortest paths
+                nb_sp = len(all_paths[vj][vk])
+                # Betweenness centrality of the node
+                bc_node += sp_through_vi/nb_sp
         if normalize:
             bc_dict[vi] = (bc_node * 2) / ((len(vertices) - 1)*(len(vertices) - 2))
         else:
             bc_dict[vi] = bc_node
-        if directed_graph:
-            bc_dict[vi] = bc_dict[vi] /2
 
     return bc_dict
 
@@ -53,13 +48,12 @@ def get_all_paths_for_all_pairs(G, vertices, shortest_paths_time):
     if shortest_paths_time:
         start = time.clock()
 
-    for vj in vertices:
-        for vk in vertices:
-            # all_shortest_paths return a list of lists
+    for i, vj in enumerate(vertices[:-1]): # Exclude last, because vk = vj + 1
+        for vk in vertices[i+1:]:
+            # all_shortest_paths returns a list of lists
             #     with all the shortest paths between 2 vertices
-            if vk != vj and nx.has_path(G, vj, vk):
-                all_paths[vj][vk] = [path for path in
-                                       nx.all_shortest_paths(G, vj, vk)]
+            all_paths[vj][vk] = [path for path in
+                     nx.all_shortest_paths(G, vj, vk)]
 
     # Display the computation time to get all the shortest paths
     if shortest_paths_time:
@@ -104,29 +98,27 @@ def plot_empirical_evaluation(G_sub, interval):
     for nodes in range(interval, G_sub.number_of_nodes() + 1, interval):
         Gi = G_sub.subgraph(list(G_sub.nodes)[0:nodes])
         start = time.time()
-        bc_dict = betweenness_centrality(Gi, normalize=True,
-                                         directed_graph=True,
-                                         shortest_paths_time = False)
+        betweenness_centrality(Gi)
         end = time.time()
         duration = end - start
         graph_values[nodes] = duration
     return graph_values
 
 
-# Test the correctness, get the top users and draw the graph
+# Show the correctness, get the top users and draw the graph
 if __name__ == '__main__':
 
     # Load a previously created subgraph
-    G_sub = nx.read_edgelist('subgraph.gz', create_using=nx.DiGraph())
+    G_sub = nx.read_edgelist('subgraph.gz')
 
     # Define the number of top users (k) we are interested to show
     k = 4
 
-    # Test the correctness of the implementation, compared to nx's function
+    # Show the correctness of the implementation, compared to nx's function
     # ---------------------------------------------------------------------
     # Our implementation of Betweenness centrality
     print("Our implementation of Betweenness centrality \n---")
-    bc_dict = betweenness_centrality(G_sub, normalize=True, directed_graph=True,
+    bc_dict = betweenness_centrality(G_sub, normalize=True,
                                      shortest_paths_time = False)
     for node, bc in bc_dict.items():
         if bc > 0:
