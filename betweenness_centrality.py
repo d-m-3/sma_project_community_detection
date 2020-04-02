@@ -92,7 +92,7 @@ def draw_graph(G, k_top_users_list):
 def plot_empirical_evaluation(G_sub, interval):
     """Empirical evaluation
     Plots the computation time (y-axis) given the number of nodes (x-axis)
-    of subgraphs, for each interval.
+    of subgraphs, for each interval of nodes.
     """
     graph_values = {}
     for nodes in range(interval, G_sub.number_of_nodes() + 1, interval):
@@ -139,5 +139,5 @@ if __name__ == '__main__':
     print(f"The {k} top users are : {k_top_users_list_nx}")
     print("===")
 
-    # Draw the graph and highlight the k top users
+    # Draw the graph and highlight the k top users, in red
     pos = draw_graph(G_sub, k_top_users_list)

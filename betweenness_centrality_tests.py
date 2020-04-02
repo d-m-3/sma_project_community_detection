@@ -16,14 +16,12 @@ class TestBetweennessCentrality(unittest.TestCase):
             our_bc = bc.betweenness_centrality(G)
             nx_bc = nx.betweenness_centrality(G)
 
-            # DEBUG
-            print("our bc", our_bc, "\n---")
-            print("nx bc ", nx_bc, "\n---")
+            side_by_side = zip(our_bc.items(),
+                               nx_bc.items())
 
-            try:
-                self.assertAlmostEqual(our_bc, nx_bc)
-            except StopIteration:
-                break
+            for (our_pair, our_value), (nx_pair, nx_value) in side_by_side:
+                self.assertEqual(our_pair, nx_pair)
+                self.assertAlmostEqual(our_value, nx_value, places=6)
 
 
 if __name__ == '__main__':
