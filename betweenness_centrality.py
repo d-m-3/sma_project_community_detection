@@ -89,14 +89,14 @@ def draw_graph(G, k_top_users_list):
     return pos # Dictionary of positions keyed by node
 
 
-def plot_empirical_evaluation(G_sub, interval):
+def plot_empirical_evaluation(G, interval):
     """Empirical evaluation
     Plots the computation time (y-axis) given the number of nodes (x-axis)
     of subgraphs, for each interval of nodes.
     """
     graph_values = {}
-    for nodes in range(interval, G_sub.number_of_nodes() + 1, interval):
-        Gi = G_sub.subgraph(list(G_sub.nodes)[0:nodes])
+    for nodes in range(interval, G.number_of_nodes(), interval):
+        Gi = G.subgraph(list(G.nodes)[0:nodes])
         start = time.time()
         betweenness_centrality(Gi)
         end = time.time()
