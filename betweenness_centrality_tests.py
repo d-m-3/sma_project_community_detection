@@ -7,7 +7,7 @@ from tools import lecture_graph
 class TestBetweennessCentrality(unittest.TestCase):
 
     Gs = [lecture_graph(), nx.florentine_families_graph(),
-          nx.karate_club_graph()]
+          nx.karate_club_graph(), nx.read_edgelist("subgraph.gz")]
 
     def test_compare_our_betweenness_centrality_with_networkx(self):
         """Compare the output of our betweenness centrality algorithm with networkx's
