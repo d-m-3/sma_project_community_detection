@@ -1,16 +1,21 @@
 import time
 import networkx as nx
 
+
 class Timer:
     def __init__(self, message):
         self.message = message
 
+    def get_time(self):
+        return time.time() - self.start
+
     def __enter__(self):
         print(f"{self.message}")
         self.start = time.time()
+        return self
 
     def __exit__(self, type, value, trace):
-        time_ = time.time() - self.start
+        time_ = self.get_time()
         print(f" - {time_:f} sec")
 
 

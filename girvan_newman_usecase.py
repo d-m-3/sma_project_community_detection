@@ -65,12 +65,12 @@ def visualization(G, communities):
 
 
 def main():
-    G = nx.read_edgelist('subgraph.gz')
+    G = nx.read_edgelist("subgraph.gz")
     # from tools import lecture_graph
     # G = lecture_graph()
     communities = analysis(G)
     visualization(G, communities)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
