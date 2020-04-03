@@ -26,6 +26,7 @@ def draw_graph(G, k_top_users_list):
     plt.figure(1,figsize=(12,12))
     nx.draw(G, pos, with_labels = True, node_size = 60, font_size = 8,
             node_color=color_list, edge_color = 'g', width = 1, alpha = 0.7)
+    plt.show()
     return pos # Dictionary of positions keyed by node
 
 
