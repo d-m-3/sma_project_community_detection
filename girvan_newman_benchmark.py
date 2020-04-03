@@ -46,6 +46,7 @@ def benchmark_girvan_newman(G):
     plt.plot(X, Y_our, label="Our implementation")
     plt.plot(X, Y_nx, label="Networkx implementation")
     plt.legend()
+    plt.savefig("benchmark_girvan_newman.png")
 
     Y_our_cumulative = get_cumulative_array(Y_our)
     Y_nx_cumulative = get_cumulative_array(Y_nx)
@@ -57,6 +58,7 @@ def benchmark_girvan_newman(G):
     plt.plot(X, Y_our_cumulative, label="Our implementation")
     plt.plot(X, Y_nx_cumulative, label="Networkx implementation")
     plt.legend()
+    plt.savefig("benchmark_girvan_newman_cumulative.png")
 
 
 def benchmark_edge_betweenness_centrality(G):
@@ -82,7 +84,7 @@ def benchmark_edge_betweenness_centrality(G):
     plt.plot(X, Y_our, label="Our implementation")
     plt.plot(X, Y_nx, label="Networkx implementation")
     plt.legend()
-
+    plt.savefig("benchmark_edge_betweenness_centrality.png")
 
 
 def get_cumulative_array(a):

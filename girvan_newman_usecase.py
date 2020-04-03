@@ -8,7 +8,7 @@ from girvan_newman import girvan_newman
 
 def analysis(G):
     print("Starting analysis...")
-    max_iteration_level = 4
+    max_iteration_level = 5
 
     gn_iterator = girvan_newman(G)
     gn_iterator = itertools.islice(gn_iterator, max_iteration_level)
@@ -61,6 +61,7 @@ def visualization(G, communities):
         pos = nx.spring_layout(G)
         nx.draw_networkx_nodes(G, pos, node_color=colors, cmap="brg")
         nx.draw_networkx_edges(G, pos)
+        plt.savefig(f"gn-uc-{level}.png")
     plt.show()
 
 
